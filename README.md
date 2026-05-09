@@ -6,9 +6,13 @@ A C++ console application for managing student records.
 - Add Student
 - Display All Students
 - Search Student by ID
-- Update Student Grade
+- Search Student by Name
+- Update Student Information
 - Delete Student
-- Class Statistics (average, highest, lowest)
+- Sort Students by Grade
+- Class Statistics
+- Letter Grade System (A, B, C, D, F)
+
 
 ## How to Compile & Run
 
