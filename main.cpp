@@ -2,15 +2,10 @@
 #include <string>
 using namespace std;
 
-struct Student {
-    int    id;
-    string name;
-    float  grade;
-};
+struct Student { int id; string name; float grade; };
 
 Student students[100];
-int maxStudents = 0;
-int count = 0;
+int maxStudents = 0, count = 0;
 
 string letterGrade(float g) {
     if (g >= 90) return "A";
@@ -20,154 +15,115 @@ string letterGrade(float g) {
     return "F";
 }
 
+void printStudent(int i) {
+    cout << "ID: " << students[i].id << "  Name: " << students[i].name
+         << "  Grade: " << students[i].grade << " (" << letterGrade(students[i].grade) << ")\n";
+}
+
+int findByID(int id) {
+    for (int i = 0; i < count; i++)
+        if (students[i].id == id) return i;
+    return -1;
+}
+
 void addStudent() {
     if (count >= maxStudents) { cout << "Limit reached!\n"; return; }
     Student s;
     cout << "Enter ID: ";    cin >> s.id;
     cout << "Enter Name: ";  cin.ignore(); getline(cin, s.name);
     cout << "Enter Grade: "; cin >> s.grade;
-
-    for (int i = 0; i < count; i++) {
-        if (students[i].id == s.id) { cout << "ID already exists!\n"; return; }
-    }
-    if (s.grade < 0 || s.grade > 100) { cout << "Invalid grade!\n"; return; }
-
+    if (findByID(s.id) != -1)          { cout << "ID already exists!\n"; return; }
+    if (s.grade < 0 || s.grade > 100)  { cout << "Invalid grade!\n";     return; }
     students[count++] = s;
     cout << "Student added! (" << count << "/" << maxStudents << ")\n";
 }
 
 void displayAll() {
     if (count == 0) { cout << "No students yet.\n"; return; }
-    cout << "\nID    Name                  Grade  Letter\n";
-    cout << "------------------------------------------\n";
-    for (int i = 0; i < count; i++) {
-        cout << students[i].id    << "    "
-             << students[i].name  << "    "
-             << students[i].grade << "    "
-             << letterGrade(students[i].grade) << "\n";
-    }
+    cout << "\nID    Name                  Grade  Letter\n"
+         << "------------------------------------------\n";
+    for (int i = 0; i < count; i++) printStudent(i);
 }
 
-// البحث بالـ ID
 void searchByID() {
-    int id;
-    cout << "Enter ID: "; cin >> id;
-    for (int i = 0; i < count; i++) {
-        if (students[i].id == id) {
-            cout << "Name: "  << students[i].name  << "\n"
-                 << "Grade: " << students[i].grade << " ("
-                 << letterGrade(students[i].grade) << ")\n";
-            return;
-        }
-    }
-    cout << "Not found!\n";
+    int id; cout << "Enter ID: "; cin >> id;
+    int i = findByID(id);
+    if (i != -1) printStudent(i); else cout << "Not found!\n";
 }
 
-// البحث بالاسم (جديد)
 void searchByName() {
-    string name;
+    string name; bool found = false;
     cout << "Enter Name: "; cin.ignore(); getline(cin, name);
-    bool found = false;
-    for (int i = 0; i < count; i++) {
-        if (students[i].name == name) {
-            cout << "ID: "    << students[i].id    << "\n"
-                 << "Grade: " << students[i].grade << " ("
-                 << letterGrade(students[i].grade) << ")\n";
-            found = true;
-        }
-    }
+    for (int i = 0; i < count; i++)
+        if (students[i].name == name) { printStudent(i); found = true; }
     if (!found) cout << "Not found!\n";
 }
 
-// تعديل الاسم والدرجة (محدّث)
 void updateStudent() {
-    int id;
-    cout << "Enter ID: "; cin >> id;
-    for (int i = 0; i < count; i++) {
-        if (students[i].id == id) {
-            cout << "1.Update Name  2.Update Grade  3.Update Both\nChoice: ";
-            int ch; cin >> ch;
-            if (ch == 1 || ch == 3) {
-                cout << "New Name: "; cin.ignore(); getline(cin, students[i].name);
-            }
-            if (ch == 2 || ch == 3) {
-                cout << "New Grade: "; cin >> students[i].grade;
-            }
-            cout << "Updated!\n"; return;
-        }
-    }
-    cout << "Not found!\n";
+    int id; cout << "Enter ID: "; cin >> id;
+    int i = findByID(id);
+    if (i == -1) { cout << "Not found!\n"; return; }
+    cout << "1.Update Name  2.Update Grade  3.Update Both\nChoice: ";
+    int ch; cin >> ch;
+    if (ch == 1 || ch == 3) { cout << "New Name: ";  cin.ignore(); getline(cin, students[i].name); }
+    if (ch == 2 || ch == 3) { cout << "New Grade: "; cin >> students[i].grade; }
+    cout << "Updated!\n";
 }
 
 void deleteStudent() {
-    int id;
-    cout << "Enter ID: "; cin >> id;
-    for (int i = 0; i < count; i++) {
-        if (students[i].id == id) {
-            for (int j = i; j < count - 1; j++)
-                students[j] = students[j + 1];
-            count--;
-            cout << "Deleted!\n"; return;
-        }
-    }
-    cout << "Not found!\n";
+    int id; cout << "Enter ID: "; cin >> id;
+    int i = findByID(id);
+    if (i == -1) { cout << "Not found!\n"; return; }
+    for (int j = i; j < count - 1; j++) students[j] = students[j + 1];
+    cout << "Deleted!\n"; count--;
 }
 
 void showStats() {
     if (count == 0) { cout << "No students yet.\n"; return; }
     float sum = 0, high = students[0].grade, low = students[0].grade;
-    int pass = 0, fail = 0;
+    int pass = 0;
     for (int i = 0; i < count; i++) {
         sum += students[i].grade;
         if (students[i].grade > high) high = students[i].grade;
         if (students[i].grade < low)  low  = students[i].grade;
-        if (students[i].grade >= 60) pass++; else fail++;  // ناجح/راسب (جديد)
+        if (students[i].grade >= 60)  pass++;
     }
-    cout << "Total: "   << count       << "\n"
-         << "Average: " << sum / count << "\n"
-         << "Highest: " << high        << "\n"
-         << "Lowest: "  << low         << "\n"
-         << "Passed: "  << pass        << "\n"  // جديد
-         << "Failed: "  << fail        << "\n"; // جديد
+    cout << "Total: "   << count        << "\n"
+         << "Average: " << sum / count  << "\n"
+         << "Highest: " << high         << "\n"
+         << "Lowest: "  << low          << "\n"
+         << "Passed: "  << pass         << "\n"
+         << "Failed: "  << count - pass << "\n";
 }
 
-// ترتيب حسب الدرجة - Bubble Sort (جديد)
 void sortByGrade() {
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
-            if (students[j].grade < students[j + 1].grade) {
-                Student temp  = students[j];
-                students[j]   = students[j + 1];
-                students[j+1] = temp;
-            }
-        }
-    }
+    for (int i = 0; i < count - 1; i++)
+        for (int j = 0; j < count - i - 1; j++)
+            if (students[j].grade < students[j+1].grade)
+                { Student t = students[j]; students[j] = students[j+1]; students[j+1] = t; }
     cout << "Sorted! Displaying from highest to lowest:\n";
     displayAll();
 }
 
 int main() {
     cout << "How many students? "; cin >> maxStudents;
-
+    if (maxStudents > 100) maxStudents = 100;
     int choice;
     do {
         cout << "\n1.Add  2.Display  3.Search by ID  4.Search by Name\n"
-             << "5.Update  6.Delete  7.Stats  8.Sort by Grade  0.Exit\n"
-             << "Choice: ";
+             << "5.Update  6.Delete  7.Stats  8.Sort by Grade  0.Exit\nChoice: ";
         cin >> choice;
         switch (choice) {
-            case 1: addStudent();   break;
-            case 2: displayAll();   break;
-            case 3: searchByID();   break;
-            case 4: searchByName(); break;
-            case 5: updateStudent();break;
-            case 6: deleteStudent();break;
-            case 7: showStats();    break;
-            case 8: sortByGrade();  break;
+            case 1: addStudent();    break;
+            case 2: displayAll();    break;
+            case 3: searchByID();    break;
+            case 4: searchByName();  break;
+            case 5: updateStudent(); break;
+            case 6: deleteStudent(); break;
+            case 7: showStats();     break;
+            case 8: sortByGrade();   break;
             case 0: cout << "Goodbye!\n"; break;
             default: cout << "Invalid option!\n";
         }
     } while (choice != 0);
-
-    return 0;
 }
