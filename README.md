@@ -26,11 +26,14 @@ g++ main.cpp -o student_system
 ```
 How many students? 3
 
-1.Add  2.Display  3.Search  4.Update  5.Delete  6.Stats  0.Exit
+1.Add  2.Display  3.Search by ID  4.Search by Name
+5.Update  6.Delete  7.Stats  8.Sort by Grade  0.Exit
+
 Choice: 1
 Enter ID: 101
 Enter Name: Ali Hassan
 Enter Grade: 88
+
 Student added! (1/3)
 ```
 
